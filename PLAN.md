@@ -230,7 +230,21 @@ Phase 9와 같은 관점(콘솔 배선은 GoogleTest로 못 잡는다)으로 `sr
       기본값)을 적용해 GREEN 확인.
 - [x] `test.ps1`(GoogleTest 113개) + `system-test.ps1`(8개 시나리오) 전체 재확인.
 
-## 진행 방식 요약
+## Phase 11 — 테스트 실행 전용 서브에이전트 도입 (완료)
+
+지금까지는 코드 변경 후 검증이 필요할 때 Git Bash 창을 여러 개 띄워 Claude Code를
+동시에 여러 개 돌리는 식(멀티 스레드/창)으로 대응해왔다. 이를 대체해, 이 저장소
+전용 서브에이전트 `test-runner`를 도입해 "코드 변경 → 두 테스트 스위트 실행 → 결과
+보고"를 에이전트 위임으로 처리할 수 있게 했다.
+
+- [x] `.claude/agents/test-runner.md` 신설 — `test.ps1`(GoogleTest, 로직 계층)과
+      `system-test.ps1`(콘솔 시스템 테스트, 실행 파일 전체 플로우) **둘 다** 실행하고
+      pass/fail을 정리해 보고하는 전용 에이전트. Phase 9/10에서 GoogleTest 단독으로는
+      못 잡는 버그가 실제로 있었다는 점을 근거로, 두 스위트를 모두 돌리도록 명시.
+      본인은 프로덕션 코드를 고치지 않고 결과 보고만 하도록 역할 한정(커밋/문서 수정도
+      금지).
+- [x] 새 세션에서부터 `test-runner`로 위임 가능(에이전트 정의는 세션 시작 시 로드되므로
+      현재 세션에는 즉시 반영되지 않음을 확인).
 
 각 Phase 내부는 `.claude/skills/test-driven-development/SKILL.md`의 Red-Green-Refactor
 사이클을 기능 단위로 반복한다. Phase 착수 전 해당 docs/FEATURES/*.md의 Acceptance
