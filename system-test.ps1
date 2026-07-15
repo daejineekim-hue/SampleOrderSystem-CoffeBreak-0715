@@ -42,6 +42,13 @@ function Assert-True {
     }
 }
 
+function Assert-NotContains {
+    param([string]$Output, [string]$Unexpected, [string]$Scenario)
+    if ($Output -like "*$Unexpected*") {
+        $script:failures += "[$Scenario] stdout에 나타나면 안 되는 문자열이 있음: '$Unexpected'"
+    }
+}
+
 # ---- 시나리오 1: 정상 플로우 (재고충분 승인 -> 출고) ----
 $result = Invoke-Scenario @(
     "1", "1", "SMP-001", "Wafer-A", "20", "0.9", "100", "0",
@@ -130,6 +137,22 @@ Assert-Contains $result.Output "주문량 확인" "S7-no-input-swallowed-after-o
 Assert-Contains $result.Output "시스템을 종료합니다" "S7-no-input-swallowed-after-oneshot-screen"
 Assert-True ($result.ExitCode -eq 0) "예상치 못한 종료 코드: $($result.ExitCode)" "S7-no-input-swallowed-after-oneshot-screen"
 
+# ---- 시나리오 8: 시료 등록 중 숫자 필드에 비숫자 입력 -> 스트림이 깨져 이후
+#      메뉴 탐색이 오염되면 안 됨 ----
+# 회귀: SampleManagementController::registerSample()/OrderIntakeController::
+# registerOrder()의 cin >> (숫자) 읽기에 실패 가드가 없어, 비숫자 입력 시 cin이
+# fail 상태가 되고 뒤이은 필드 읽기가 모두 스킵되어 결과적으로 이후 메뉴 선택이
+# 엉뚱하게 소비되거나 가짜 "유효하지 않은 선택" 오류가 끼어들었다.
+$result = Invoke-Scenario @(
+    "1", "1", "SMP-001", "Wafer-A", "abc", "0.9", "100", "0",
+    "0"
+)
+Assert-Contains $result.Output "[오류]" "S8-non-numeric-field-guarded"
+Assert-NotContains $result.Output "유효하지 않은 선택입니다" "S8-non-numeric-field-guarded"
+Assert-NotContains $result.Output "유효하지 않은 메뉴 번호입니다" "S8-non-numeric-field-guarded"
+Assert-Contains $result.Output "시스템을 종료합니다" "S8-non-numeric-field-guarded"
+Assert-True ($result.ExitCode -eq 0) "예상치 못한 종료 코드: $($result.ExitCode)" "S8-non-numeric-field-guarded"
+
 Remove-Item $samplesFile, $ordersFile -ErrorAction SilentlyContinue
 
 if ($script:failures.Count -gt 0) {
@@ -138,4 +161,4 @@ if ($script:failures.Count -gt 0) {
     exit 1
 }
 
-Write-Output "`n모든 시스템 테스트 통과 (7개 시나리오)"
+Write-Output "`n모든 시스템 테스트 통과 (8개 시나리오)"

@@ -49,11 +49,22 @@ void SampleManagementController::registerSample() {
     std::cout << "시료명: ";
     std::getline(std::cin, sample.name);
     std::cout << "평균 생산시간(분): ";
-    std::cin >> sample.avgProcessTimeMin;
+    if (!(std::cin >> sample.avgProcessTimeMin)) {
+        std::cin.clear();
+        sample.avgProcessTimeMin = -1;  // Sample::validateFields rejects this
+    }
+    skipToNextLine();
     std::cout << "수율 (0 초과 1 이하): ";
-    std::cin >> sample.yieldRate;
+    if (!(std::cin >> sample.yieldRate)) {
+        std::cin.clear();
+        sample.yieldRate = -1;  // Sample::validateFields rejects this
+    }
+    skipToNextLine();
     std::cout << "초기 재고: ";
-    std::cin >> sample.stock;
+    if (!(std::cin >> sample.stock)) {
+        std::cin.clear();
+        sample.stock = -1;  // Sample::validateFields rejects this
+    }
     skipToNextLine();
 
     try {

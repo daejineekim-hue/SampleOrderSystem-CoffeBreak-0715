@@ -206,6 +206,30 @@ Phase 8 리팩토링 직후 실제 exe로 생산라인 완료를 데모하다가
       버그에 의존해 우연히 통과하던 여분의 `"0"`도 함께 제거.
 - [x] `test.ps1`(GoogleTest 113개) + `system-test.ps1`(7개 시나리오) 전체 재확인.
 
+## Phase 10 — 버그 수정: 숫자 입력 필드 실패 가드 누락 (완료)
+
+Phase 9와 같은 관점(콘솔 배선은 GoogleTest로 못 잡는다)으로 `src/controller/`
+전체의 `cin >>` 사용처를 재조사해 발견한 버그. 메뉴 번호(choice)를 읽는 4곳
+(`ConsoleSubmenuController`/`OrderApprovalController`/`DummyDataController`)은
+전부 `if (!(cin >> x)) { cin.clear(); x = 기본값; }` 가드가 있는데,
+`SampleManagementController::registerSample()`의 평균생산시간/수율/재고 3곳과
+`OrderIntakeController::registerOrder()`의 수량 1곳, 총 4개 숫자 필드에는 이
+가드가 없었다.
+
+비숫자 입력(예: "abc")이 들어오면 해당 `cin >>` 추출이 실패해 스트림이 fail
+상태가 되고, 뒤이은 필드 읽기들도 조용히 스킵되어 기본값(0)으로 등록이
+시도되다가 검증에서 거부되는 것까지는 괜찮지만, 실패를 유발한 입력 잔여분이
+버퍼에 남아있다가 이후 메뉴 탐색(뒤로가기/종료 등)을 엉뚱하게 소비해 가짜
+"유효하지 않은 선택입니다"/"유효하지 않은 메뉴 번호입니다" 오류가 끼어드는
+현상을 확인했다 (완전한 무한루프까지는 아니었으나 명백한 오동작).
+
+- [x] `system-test.ps1`에 시나리오 8 추가(시료 등록 중 평균생산시간에 "abc" 입력
+      후 정상적으로 뒤로가기/종료까지 이어지는지 확인)로 RED 재현 후,
+      `SampleManagementController`/`OrderIntakeController`의 4개 숫자 필드에
+      기존과 동일한 가드 패턴(`cin.clear()` + 검증에서 자연히 거부되는 안전한
+      기본값)을 적용해 GREEN 확인.
+- [x] `test.ps1`(GoogleTest 113개) + `system-test.ps1`(8개 시나리오) 전체 재확인.
+
 ## 진행 방식 요약
 
 각 Phase 내부는 `.claude/skills/test-driven-development/SKILL.md`의 Red-Green-Refactor

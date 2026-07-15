@@ -50,7 +50,10 @@ void OrderIntakeController::registerOrder() {
     std::cout << "고객명: ";
     std::getline(std::cin, customerName);
     std::cout << "수량: ";
-    std::cin >> quantity;
+    if (!(std::cin >> quantity)) {
+        std::cin.clear();
+        quantity = 0;  // OrderRepository::registerOrder rejects quantity <= 0
+    }
     skipToNextLine();
 
     try {
