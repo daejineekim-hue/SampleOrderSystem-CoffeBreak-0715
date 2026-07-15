@@ -160,6 +160,34 @@ production/controller 라우팅)만 검증하고 실제 컴파일된 `SampleOrde
 - [x] `.claude/skills/system-test/SKILL.md` 등록 — 콘솔 입출력에 영향을 주는 변경
       후에는 이 스킬을 참고해 `system-test.ps1` 시나리오를 갱신/추가하도록 안내
 
+## Phase 8 — 아키텍처 리팩토링 (완료)
+
+Phase 0~7로 기능 요구사항은 모두 구현되었으나, TDD로 기능을 하나씩 쌓는 과정에서
+생긴 구조적 부채가 있어 사용자 요청으로 추가된 리팩토링 단계. 세부 설계는
+[docs/design_refact.md](docs/design_refact.md) 참고. **동작은 바꾸지 않고 구조만
+변경** — 매 항목 후 GoogleTest/system-test.ps1 회귀 확인.
+
+- [x] **항목 1+2: `OrderRepository` 책임 분리 + `ProductionLine` 양방향 결합 제거** —
+      `OrderRepository`에서 `approve`/`reject`/`release`/`completeProduction`을
+      제거하고 검증 없는 `updateStatus`만 남김(CRUD 전용화). 사용자 트리거 전이는
+      신설 `src/service/OrderLifecycleService`(approve/reject/release)로 이동.
+      생산 완료 시점의 재고/상태 반영(Formula #3)은 `ProductionLine`이
+      `OrderRepository::updateStatus`/`SampleRepository::updateStock`을 직접 호출하는
+      방식으로 변경해, `OrderRepository`가 더 이상 `ProductionLine`을 몰라도 되게 함
+      (전방 선언 제거, 순환 의존 해소). `OrderApprovalTest`/`ShipmentTest`/
+      `ProductionLineTest`를 새 호출부에 맞게 갱신, 기존 Acceptance Criteria 불변.
+- [x] **항목 3: 콘솔 서브메뉴 루프 중복 제거** — `ConsoleSubmenuController` 베이스
+      클래스 신설(`run()`을 템플릿 메서드로 구현), `SampleManagementController`/
+      `OrderIntakeController`/`OrderApprovalController`/`ShipmentController` 4곳이
+      상속해 `showPrompt()`/`handle()`만 구현하도록 변경. `system-test.ps1`로
+      실제 콘솔 플로우 회귀 없음 확인.
+- [x] **항목 4: `MenuSummaryProvider`의 `Monitoring` 로직 중복 제거** —
+      `productionWaitingCount` 계산을 자체 루프 대신
+      `Monitoring::countByStatus(orders).reserved + .producing`으로 교체해
+      docs/adr/0002 정의와의 드리프트 위험 제거.
+- [x] 매 항목 적용 후 `test.ps1`(GoogleTest 113개), 항목 3 이후 `system-test.ps1`
+      (6개 시나리오)까지 재실행해 최종 회귀 없음 확인.
+
 ## 진행 방식 요약
 
 각 Phase 내부는 `.claude/skills/test-driven-development/SKILL.md`의 Red-Green-Refactor

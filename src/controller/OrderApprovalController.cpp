@@ -12,30 +12,26 @@ using model::OrderStatus;
 using view::skipToNextLine;
 
 OrderApprovalController::OrderApprovalController(repository::OrderRepository& orderRepository,
-                                                   production::ProductionLine& productionLine)
-    : orderRepository_(orderRepository), productionLine_(productionLine) {}
+                                                   production::ProductionLine& productionLine,
+                                                   service::OrderLifecycleService& orderLifecycleService)
+    : orderRepository_(orderRepository),
+      productionLine_(productionLine),
+      orderLifecycleService_(orderLifecycleService) {}
 
-void OrderApprovalController::run() {
-    while (true) {
-        std::cout << "\n-- 주문 승인/거절 --\n [1] 접수된 주문 조회  [2] 승인/거절 처리  [0] 뒤로\n선택 > ";
-        int choice = -1;
-        if (!(std::cin >> choice)) {
-            std::cin.clear();
-            choice = -1;
-        }
-        skipToNextLine();
+void OrderApprovalController::showPrompt() {
+    std::cout << "\n-- 주문 승인/거절 --\n [1] 접수된 주문 조회  [2] 승인/거절 처리  [0] 뒤로\n선택 > ";
+}
 
-        if (choice == 0) return;
-        switch (choice) {
-            case 1:
-                listReserved();
-                break;
-            case 2:
-                approveOrReject();
-                break;
-            default:
-                std::cout << "[오류] 유효하지 않은 선택입니다.\n";
-        }
+bool OrderApprovalController::handle(int choice) {
+    switch (choice) {
+        case 1:
+            listReserved();
+            return true;
+        case 2:
+            approveOrReject();
+            return true;
+        default:
+            return false;
     }
 }
 
@@ -65,10 +61,10 @@ void OrderApprovalController::approveOrReject() {
 
     try {
         if (choice == 1) {
-            const Order& approved = orderRepository_.approve(orderId, productionLine_);
+            const Order& approved = orderLifecycleService_.approve(orderId, productionLine_);
             std::cout << "처리되었습니다. 상태: " << Order::statusToString(approved.status) << "\n";
         } else if (choice == 2) {
-            orderRepository_.reject(orderId);
+            orderLifecycleService_.reject(orderId);
             std::cout << "거절되었습니다.\n";
         } else {
             std::cout << "[오류] 유효하지 않은 선택입니다.\n";

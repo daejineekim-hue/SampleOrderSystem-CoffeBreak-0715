@@ -75,6 +75,24 @@ void ProductionLine::startEntry(QueueEntry& entry) {
     entry.started = true;
 }
 
+void ProductionLine::completeHead(const QueueEntry& head) {
+    const Order* order = orderRepository_.findById(head.orderId);
+    if (!order) throw std::invalid_argument("생산 큐에 존재하지 않는 주문입니다: " + head.orderId);
+
+    int currentStock = 0;
+    for (const auto& sample : sampleRepository_.findAll()) {
+        if (sample.id == order->sampleId) {
+            currentStock = sample.stock;
+            break;
+        }
+    }
+
+    // Formula #3 (docs/FEATURES/production-line.md): net stock change is
+    // +producedTotal, -quantity, applied together with the status flip.
+    sampleRepository_.updateStock(order->sampleId, currentStock + head.producedTotal - order->quantity);
+    orderRepository_.updateStatus(head.orderId, model::OrderStatus::CONFIRMED);
+}
+
 void ProductionLine::advanceIfDue() {
     auto now = clock_();
     while (!queue_.empty()) {
@@ -82,7 +100,7 @@ void ProductionLine::advanceIfDue() {
         double elapsed = toMinutes(now - head.productionStartedAt);
         if (elapsed + kEpsilon < head.productionTimeMin) break;
 
-        orderRepository_.completeProduction(head.orderId, head.producedTotal);
+        completeHead(head);
         queue_.pop_front();
         if (!queue_.empty()) {
             startEntry(queue_.front());

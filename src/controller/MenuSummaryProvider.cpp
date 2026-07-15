@@ -1,8 +1,10 @@
 #include "controller/MenuSummaryProvider.h"
 
+#include "model/Monitoring.h"
+
 namespace sos::controller {
 
-using model::OrderStatus;
+using model::Monitoring;
 
 MenuSummaryProvider::MenuSummaryProvider(repository::SampleRepository& sampleRepository,
                                           repository::OrderRepository& orderRepository)
@@ -17,11 +19,11 @@ MenuSummary MenuSummaryProvider::getSummary() {
 
     auto orders = orderRepository_.findAll();
     summary.totalOrders = static_cast<int>(orders.size());
-    for (const auto& order : orders) {
-        if (order.status == OrderStatus::RESERVED || order.status == OrderStatus::PRODUCING) {
-            ++summary.productionWaitingCount;
-        }
-    }
+
+    // docs/adr/0002: reuse monitoring.md's pendingDemand definition
+    // (RESERVED + PRODUCING) instead of re-deriving it here.
+    auto counts = Monitoring::countByStatus(orders);
+    summary.productionWaitingCount = counts.reserved + counts.producing;
 
     return summary;
 }

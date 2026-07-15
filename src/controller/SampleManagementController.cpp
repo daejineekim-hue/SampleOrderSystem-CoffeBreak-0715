@@ -22,30 +22,23 @@ void printSample(const Sample& sample) {
 SampleManagementController::SampleManagementController(repository::SampleRepository& sampleRepository)
     : sampleRepository_(sampleRepository) {}
 
-void SampleManagementController::run() {
-    while (true) {
-        std::cout << "\n-- 시료 관리 --\n [1] 등록  [2] 전체 조회  [3] 검색  [0] 뒤로\n선택 > ";
-        int choice = -1;
-        if (!(std::cin >> choice)) {
-            std::cin.clear();
-            choice = -1;
-        }
-        skipToNextLine();
+void SampleManagementController::showPrompt() {
+    std::cout << "\n-- 시료 관리 --\n [1] 등록  [2] 전체 조회  [3] 검색  [0] 뒤로\n선택 > ";
+}
 
-        if (choice == 0) return;
-        switch (choice) {
-            case 1:
-                registerSample();
-                break;
-            case 2:
-                listSamples();
-                break;
-            case 3:
-                searchSamples();
-                break;
-            default:
-                std::cout << "[오류] 유효하지 않은 선택입니다.\n";
-        }
+bool SampleManagementController::handle(int choice) {
+    switch (choice) {
+        case 1:
+            registerSample();
+            return true;
+        case 2:
+            listSamples();
+            return true;
+        case 3:
+            searchSamples();
+            return true;
+        default:
+            return false;
     }
 }
 

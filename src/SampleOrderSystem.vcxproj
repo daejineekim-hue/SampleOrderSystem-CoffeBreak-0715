@@ -94,6 +94,7 @@
     <ClInclude Include="production\ProductionLine.h" />
     <ClInclude Include="model\Monitoring.h" />
     <ClInclude Include="controller\MainMenuController.h" />
+    <ClInclude Include="controller\ConsoleSubmenuController.h" />
     <ClInclude Include="controller\MenuSummaryProvider.h" />
     <ClInclude Include="controller\SampleManagementController.h" />
     <ClInclude Include="controller\OrderIntakeController.h" />
@@ -104,6 +105,7 @@
     <ClInclude Include="view\ConsoleMenuIO.h" />
     <ClInclude Include="generator\DummyDataGenerator.h" />
     <ClInclude Include="controller\DummyDataController.h" />
+    <ClInclude Include="service\OrderLifecycleService.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="json\JsonValue.cpp" />
@@ -114,6 +116,7 @@
     <ClCompile Include="production\ProductionLine.cpp" />
     <ClCompile Include="model\Monitoring.cpp" />
     <ClCompile Include="controller\MainMenuController.cpp" />
+    <ClCompile Include="controller\ConsoleSubmenuController.cpp" />
     <ClCompile Include="controller\MenuSummaryProvider.cpp" />
     <ClCompile Include="controller\SampleManagementController.cpp" />
     <ClCompile Include="controller\OrderIntakeController.cpp" />
@@ -124,6 +127,7 @@
     <ClCompile Include="view\ConsoleMenuIO.cpp" />
     <ClCompile Include="generator\DummyDataGenerator.cpp" />
     <ClCompile Include="controller\DummyDataController.cpp" />
+    <ClCompile Include="service\OrderLifecycleService.cpp" />
   </ItemGroup>
 
   <ItemGroup>

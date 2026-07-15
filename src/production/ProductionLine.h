@@ -35,7 +35,7 @@ public:
                     Clock clock = &std::chrono::system_clock::now);
 
     // Registers an order (already transitioned to PRODUCING by
-    // OrderRepository::approve) at the tail of the queue. If it becomes the
+    // service::OrderLifecycleService::approve) at the tail of the queue. If it becomes the
     // new head (queue was empty), its shortage/producedTotal/productionTimeMin
     // are computed immediately against the sample's current stock.
     void enqueue(const std::string& orderId);
@@ -66,6 +66,10 @@ private:
     std::deque<QueueEntry> queue_;
 
     void startEntry(QueueEntry& entry);
+    // Applies Formula #3 (stock +producedTotal/-quantity, status ->
+    // CONFIRMED) directly via OrderRepository/SampleRepository; no callback
+    // into a service is needed (docs/design_refact.md item 1+2).
+    void completeHead(const QueueEntry& head);
 };
 
 }  // namespace sos::production

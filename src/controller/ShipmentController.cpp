@@ -3,36 +3,26 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "view/ConsoleMenuIO.h"
-
 namespace sos::controller {
 
-using view::skipToNextLine;
+ShipmentController::ShipmentController(repository::OrderRepository& orderRepository,
+                                        service::OrderLifecycleService& orderLifecycleService)
+    : orderRepository_(orderRepository), orderLifecycleService_(orderLifecycleService) {}
 
-ShipmentController::ShipmentController(repository::OrderRepository& orderRepository)
-    : orderRepository_(orderRepository) {}
+void ShipmentController::showPrompt() {
+    std::cout << "\n-- 출고 처리 --\n [1] 출고 가능 목록  [2] 출고 실행  [0] 뒤로\n선택 > ";
+}
 
-void ShipmentController::run() {
-    while (true) {
-        std::cout << "\n-- 출고 처리 --\n [1] 출고 가능 목록  [2] 출고 실행  [0] 뒤로\n선택 > ";
-        int choice = -1;
-        if (!(std::cin >> choice)) {
-            std::cin.clear();
-            choice = -1;
-        }
-        skipToNextLine();
-
-        if (choice == 0) return;
-        switch (choice) {
-            case 1:
-                listShippable();
-                break;
-            case 2:
-                releaseOrder();
-                break;
-            default:
-                std::cout << "[오류] 유효하지 않은 선택입니다.\n";
-        }
+bool ShipmentController::handle(int choice) {
+    switch (choice) {
+        case 1:
+            listShippable();
+            return true;
+        case 2:
+            releaseOrder();
+            return true;
+        default:
+            return false;
     }
 }
 
@@ -54,7 +44,7 @@ void ShipmentController::releaseOrder() {
     std::getline(std::cin, orderId);
 
     try {
-        orderRepository_.release(orderId);
+        orderLifecycleService_.release(orderId);
         std::cout << "출고 처리되었습니다.\n";
     } catch (const std::invalid_argument& e) {
         std::cout << "[오류] " << e.what() << "\n";

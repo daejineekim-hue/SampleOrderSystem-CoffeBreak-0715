@@ -1,16 +1,18 @@
 #pragma once
 
-#include "controller/MainMenuController.h"
+#include "controller/ConsoleSubmenuController.h"
 #include "repository/OrderRepository.h"
 
 namespace sos::controller {
 
 // Console-driven submenu for docs/FEATURES/order-intake.md (register/list).
-class OrderIntakeController : public SubController {
+class OrderIntakeController : public ConsoleSubmenuController {
 public:
     explicit OrderIntakeController(repository::OrderRepository& orderRepository);
 
-    void run() override;
+protected:
+    void showPrompt() override;
+    bool handle(int choice) override;
 
 private:
     repository::OrderRepository& orderRepository_;

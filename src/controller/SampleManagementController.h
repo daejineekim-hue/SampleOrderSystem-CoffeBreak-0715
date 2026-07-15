@@ -1,6 +1,6 @@
 #pragma once
 
-#include "controller/MainMenuController.h"
+#include "controller/ConsoleSubmenuController.h"
 #include "repository/SampleRepository.h"
 
 namespace sos::controller {
@@ -10,11 +10,13 @@ namespace sos::controller {
 // docs/FEATURES/main-menu.md's Testability note; the underlying business
 // logic (SampleRepository/Sample) is already covered by
 // SampleTest/SampleRepositoryTest.
-class SampleManagementController : public SubController {
+class SampleManagementController : public ConsoleSubmenuController {
 public:
     explicit SampleManagementController(repository::SampleRepository& sampleRepository);
 
-    void run() override;
+protected:
+    void showPrompt() override;
+    bool handle(int choice) override;
 
 private:
     repository::SampleRepository& sampleRepository_;

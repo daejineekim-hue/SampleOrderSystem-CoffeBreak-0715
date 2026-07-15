@@ -8,6 +8,7 @@
 #include "production/ProductionLine.h"
 #include "repository/OrderRepository.h"
 #include "repository/SampleRepository.h"
+#include "service/OrderLifecycleService.h"
 
 // docs/FEATURES/production-line.md Acceptance Criteria.
 
@@ -17,6 +18,7 @@ using sos::model::Sample;
 using sos::production::ProductionLine;
 using sos::repository::OrderRepository;
 using sos::repository::SampleRepository;
+using sos::service::OrderLifecycleService;
 
 namespace {
 
@@ -38,6 +40,7 @@ protected:
         now_ = FixedStart();
         clock_ = [this]() { return now_; };
         line_ = std::make_unique<ProductionLine>(*orderRepo_, *sampleRepo_, clock_);
+        service_ = std::make_unique<OrderLifecycleService>(*orderRepo_, *sampleRepo_);
     }
 
     void TearDown() override {
@@ -87,7 +90,7 @@ protected:
     Order approveIntoProduction(const std::string& sampleId, const std::string& customer,
                                  int quantity) {
         std::string orderId = orderRepo_->registerOrder(sampleId, customer, quantity).orderId;
-        const Order& approved = orderRepo_->approve(orderId, *line_);
+        const Order& approved = service_->approve(orderId, *line_);
         EXPECT_EQ(approved.status, OrderStatus::PRODUCING);
         return approved;
     }
@@ -97,6 +100,7 @@ protected:
     std::chrono::system_clock::time_point now_;
     ProductionLine::Clock clock_;
     std::unique_ptr<ProductionLine> line_;
+    std::unique_ptr<OrderLifecycleService> service_;
 };
 
 }  // namespace

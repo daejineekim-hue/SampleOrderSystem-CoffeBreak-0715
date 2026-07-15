@@ -8,10 +8,6 @@
 #include "model/Order.h"
 #include "repository/SampleRepository.h"
 
-namespace sos::production {
-class ProductionLine;
-}
-
 namespace sos::repository {
 
 // JSON-file-backed store for Order intake (docs/FEATURES/order-intake.md).
@@ -37,33 +33,15 @@ public:
     // duplicating storage (docs/FEATURES/production-line.md).
     const model::Order* findById(const std::string& orderId) const;
 
-    // Approves a RESERVED order (docs/FEATURES/order-approval.md). Routes to
-    // an immediate CONFIRMED (stock deducted) when sample.stock >= quantity,
-    // otherwise transitions to PRODUCING and registers with productionLine.
-    // Throws std::invalid_argument if orderId doesn't exist or the order is
-    // not currently RESERVED.
-    const model::Order& approve(const std::string& orderId, production::ProductionLine& productionLine);
-
-    // Rejects a RESERVED order immediately (no stock change). Throws
-    // std::invalid_argument if orderId doesn't exist or the order is not
-    // currently RESERVED.
-    const model::Order& reject(const std::string& orderId);
-
-    // Called by ProductionLine when a queued order finishes production:
-    // transitions PRODUCING -> CONFIRMED and applies the net stock change
-    // (+producedTotal, -quantity). Not part of the order-intake/approval
-    // public API surface.
-    const model::Order& completeProduction(const std::string& orderId, int producedTotal);
-
-    // Executes shipment for a CONFIRMED order (docs/FEATURES/shipment.md):
-    // transitions CONFIRMED -> RELEASE. Does not touch sample stock (already
-    // deducted at approval/production-completion time). Throws
-    // std::invalid_argument if orderId doesn't exist or the order is not
-    // currently CONFIRMED.
-    const model::Order& release(const std::string& orderId);
-
     // Orders currently eligible for shipment (status == CONFIRMED).
     std::vector<model::Order> findShippable() const;
+
+    // Sets an order's status and persists, with no validation of whether the
+    // transition is legal (same "just do it and save" contract as
+    // SampleRepository::updateStock). Legal-transition checks live in
+    // service::OrderLifecycleService/production::ProductionLine, which are
+    // the only callers. Throws std::invalid_argument if orderId is unknown.
+    const model::Order& updateStatus(const std::string& orderId, model::OrderStatus newStatus);
 
 private:
     std::string filePath_;

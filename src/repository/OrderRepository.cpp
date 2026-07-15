@@ -8,8 +8,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "production/ProductionLine.h"
-
 namespace sos::repository {
 
 using json::JsonValue;
@@ -145,56 +143,6 @@ Order* OrderRepository::findMutable(const std::string& orderId) {
     return nullptr;
 }
 
-const Order& OrderRepository::approve(const std::string& orderId,
-                                       production::ProductionLine& productionLine) {
-    Order* order = findMutable(orderId);
-    if (!order) throw std::invalid_argument("존재하지 않는 주문 ID입니다: " + orderId);
-    if (order->status != OrderStatus::RESERVED) {
-        throw std::invalid_argument("RESERVED 상태의 주문만 승인할 수 있습니다: " + orderId);
-    }
-
-    int currentStock = 0;
-    for (const auto& sample : sampleRepository_.findAll()) {
-        if (sample.id == order->sampleId) {
-            currentStock = sample.stock;
-            break;
-        }
-    }
-
-    if (currentStock >= order->quantity) {
-        order->status = OrderStatus::CONFIRMED;
-        sampleRepository_.updateStock(order->sampleId, currentStock - order->quantity);
-        save();
-    } else {
-        order->status = OrderStatus::PRODUCING;
-        save();
-        productionLine.enqueue(orderId);
-    }
-    return *order;
-}
-
-const Order& OrderRepository::reject(const std::string& orderId) {
-    Order* order = findMutable(orderId);
-    if (!order) throw std::invalid_argument("존재하지 않는 주문 ID입니다: " + orderId);
-    if (order->status != OrderStatus::RESERVED) {
-        throw std::invalid_argument("RESERVED 상태의 주문만 거절할 수 있습니다: " + orderId);
-    }
-    order->status = OrderStatus::REJECTED;
-    save();
-    return *order;
-}
-
-const Order& OrderRepository::release(const std::string& orderId) {
-    Order* order = findMutable(orderId);
-    if (!order) throw std::invalid_argument("존재하지 않는 주문 ID입니다: " + orderId);
-    if (order->status != OrderStatus::CONFIRMED) {
-        throw std::invalid_argument("CONFIRMED 상태의 주문만 출고할 수 있습니다: " + orderId);
-    }
-    order->status = OrderStatus::RELEASE;
-    save();
-    return *order;
-}
-
 std::vector<Order> OrderRepository::findShippable() const {
     std::vector<Order> shippable;
     for (const auto& order : orders_) {
@@ -203,20 +151,10 @@ std::vector<Order> OrderRepository::findShippable() const {
     return shippable;
 }
 
-const Order& OrderRepository::completeProduction(const std::string& orderId, int producedTotal) {
+const Order& OrderRepository::updateStatus(const std::string& orderId, OrderStatus newStatus) {
     Order* order = findMutable(orderId);
     if (!order) throw std::invalid_argument("존재하지 않는 주문 ID입니다: " + orderId);
-
-    int currentStock = 0;
-    for (const auto& sample : sampleRepository_.findAll()) {
-        if (sample.id == order->sampleId) {
-            currentStock = sample.stock;
-            break;
-        }
-    }
-
-    order->status = OrderStatus::CONFIRMED;
-    sampleRepository_.updateStock(order->sampleId, currentStock + producedTotal - order->quantity);
+    order->status = newStatus;
     save();
     return *order;
 }

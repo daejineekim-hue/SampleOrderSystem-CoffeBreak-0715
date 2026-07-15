@@ -11,19 +11,22 @@
 #include "production/ProductionLine.h"
 #include "repository/OrderRepository.h"
 #include "repository/SampleRepository.h"
+#include "service/OrderLifecycleService.h"
 #include "view/ConsoleMenuIO.h"
 
 int main() {
     sos::repository::SampleRepository sampleRepository("data/samples.json");
     sos::repository::OrderRepository orderRepository("data/orders.json", sampleRepository);
     sos::production::ProductionLine productionLine(orderRepository, sampleRepository);
+    sos::service::OrderLifecycleService orderLifecycleService(orderRepository, sampleRepository);
 
     sos::controller::SampleManagementController sampleManagement(sampleRepository);
     sos::controller::OrderIntakeController orderIntake(orderRepository);
-    sos::controller::OrderApprovalController orderApproval(orderRepository, productionLine);
+    sos::controller::OrderApprovalController orderApproval(orderRepository, productionLine,
+                                                             orderLifecycleService);
     sos::controller::MonitoringController monitoring(sampleRepository, orderRepository);
     sos::controller::ProductionLineController productionLineView(productionLine);
-    sos::controller::ShipmentController shipment(orderRepository);
+    sos::controller::ShipmentController shipment(orderRepository, orderLifecycleService);
     sos::generator::DummyDataGenerator dummyDataGenerator(sampleRepository);
     sos::controller::DummyDataController dummyData(dummyDataGenerator);
 
