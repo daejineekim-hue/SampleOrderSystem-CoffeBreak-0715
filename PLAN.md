@@ -140,6 +140,26 @@
       콘솔 I/O 컨트롤러(시료/주문/승인/출고 화면)에 해당하며 Phase 5에서 실제 실행
       시나리오로 수동 검증됨
 
+## Phase 7 — 콘솔 시스템 테스트 (완료)
+
+Phase 0~6의 원래 계획에는 없었으나, GoogleTest는 로직 계층(model/repository/
+production/controller 라우팅)만 검증하고 실제 컴파일된 `SampleOrderSystem.exe`를
+콘솔 입력으로 구동한 전체 플로우 검증은 Phase 5에서 사람이 수동으로 한 번 확인한
+게 전부였다. 이를 반복 가능한 자동 테스트로 만들기 위해 사용자 요청으로 추가된 단계.
+
+- [x] `system-test.ps1` 신설 — Release 빌드 후 실제 `SampleOrderSystem.exe`를 stdin
+      파이프로 구동하고 stdout/`data/*.json` 최종 상태를 검증하는 6개 시나리오:
+      정상 플로우(재고충분 승인→출고, 재고 불변 확인), 재고부족(생산라인 라우팅,
+      실생산량/생산시간 공식 실측값 확인), 주문 거절(모니터링 집계 제외 확인),
+      잘못된 메인 메뉴 입력 후 정상 복구, 숨김 더미 데이터 메뉴(9번), 즉시 종료(0).
+      시나리오마다 `data/samples.json`/`data/orders.json`을 초기화해 격리(순차 실행).
+      의도적으로 기대값을 깨뜨려 실패 감지가 되는지 확인 후 원복.
+- [x] `test.ps1`(GoogleTest 113개) 회귀 없음 재확인
+- [x] README.md "빌드 및 실행"/"상태" 절, CLAUDE.md에 "시스템 테스트" 절 추가해
+      `test.ps1`(로직 계층)과 `system-test.ps1`(실행 파일 전체 플로우)의 역할 구분 명시
+- [x] `.claude/skills/system-test/SKILL.md` 등록 — 콘솔 입출력에 영향을 주는 변경
+      후에는 이 스킬을 참고해 `system-test.ps1` 시나리오를 갱신/추가하도록 안내
+
 ## 진행 방식 요약
 
 각 Phase 내부는 `.claude/skills/test-driven-development/SKILL.md`의 Red-Green-Refactor

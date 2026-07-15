@@ -33,7 +33,8 @@
 ```powershell
 ./build.ps1 -Configuration Debug    # App 빌드 (build/x64/Debug/SampleOrderSystem.exe)
 ./build.ps1 -Configuration Test     # 테스트만 빌드 (build/x64/Test/SampleOrderSystem.exe)
-./test.ps1                          # Test 구성 빌드 + 즉시 실행
+./test.ps1                          # Test 구성 빌드 + 즉시 실행 (GoogleTest, 로직 계층)
+./system-test.ps1                   # Release 빌드 + 실제 exe를 콘솔 입력으로 구동하는 시스템 테스트
 ```
 
 ## 프로젝트 구조
@@ -49,10 +50,12 @@ packages/                       # NuGet 패키지(gmock) 실물 — 재현성을
 
 ## 상태
 
-Phase 0~6 전체 완료 (PLAN.md 참고). 시료 등록/조회/검색, 주문 접수, 승인/거절(재고
+Phase 0~7 전체 완료 (PLAN.md 참고). 시료 등록/조회/검색, 주문 접수, 승인/거절(재고
 충분 시 즉시 확정, 부족 시 단일 FIFO 생산 라인 등록 및 지연 완료 판정), 모니터링
 (상태별 주문 집계, 재고 여유/부족/고갈 판정), 출고 처리, 콘솔 메인 메뉴 라우팅,
 더미 데이터 생성(숨김 메뉴)까지 전 기능이 GoogleTest 기반 TDD로 구현되어 있다
-(비즈니스 로직 전 계층 테스트 커버, 콘솔 I/O 자체는 `docs/FEATURES/main-menu.md`의
-Testability note에 따라 수동 검증). `SampleOrderSystem.exe`를 직접 실행해 전체
-플로우(등록 → 주문 → 승인/생산 → 모니터링 → 출고)를 확인할 수 있다.
+(비즈니스 로직 전 계층 테스트 커버). 여기에 더해 `system-test.ps1`이 실제로
+컴파일된 `SampleOrderSystem.exe`를 콘솔 입력 시나리오 6종으로 구동해 전체 플로우
+(등록 → 주문 → 승인/생산 → 모니터링 → 출고, 잘못된 입력 복구, 더미 데이터 생성)를
+자동으로 검증한다 — GoogleTest(로직 계층)와 system-test.ps1(실행 파일 전체 플로우)이
+서로 다른 층위를 커버하는 구조.
