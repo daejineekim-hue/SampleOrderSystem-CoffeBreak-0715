@@ -1,9 +1,12 @@
 #include "controller/ProductionLineController.h"
 
 #include <iostream>
-#include <limits>
+
+#include "view/ConsoleMenuIO.h"
 
 namespace sos::controller {
+
+using view::skipToNextLine;
 
 ProductionLineController::ProductionLineController(production::ProductionLine& productionLine)
     : productionLine_(productionLine) {}
@@ -31,7 +34,7 @@ void ProductionLineController::run() {
     }
 
     std::cout << "\n계속하려면 Enter를 누르세요...";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    skipToNextLine();
 }
 
 }  // namespace sos::controller

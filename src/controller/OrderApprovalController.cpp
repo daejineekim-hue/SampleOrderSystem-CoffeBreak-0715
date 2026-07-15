@@ -1,19 +1,15 @@
 #include "controller/OrderApprovalController.h"
 
 #include <iostream>
-#include <limits>
 #include <stdexcept>
+
+#include "view/ConsoleMenuIO.h"
 
 namespace sos::controller {
 
 using model::Order;
 using model::OrderStatus;
-
-namespace {
-
-void skipToNextLine() { std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); }
-
-}  // namespace
+using view::skipToNextLine;
 
 OrderApprovalController::OrderApprovalController(repository::OrderRepository& orderRepository,
                                                    production::ProductionLine& productionLine)

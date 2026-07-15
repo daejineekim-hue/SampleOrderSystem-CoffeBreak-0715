@@ -1,16 +1,16 @@
 #include "controller/SampleManagementController.h"
 
 #include <iostream>
-#include <limits>
 #include <stdexcept>
+
+#include "view/ConsoleMenuIO.h"
 
 namespace sos::controller {
 
 using model::Sample;
+using view::skipToNextLine;
 
 namespace {
-
-void skipToNextLine() { std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); }
 
 void printSample(const Sample& sample) {
     std::cout << "  " << sample.id << " | " << sample.name << " | 평균생산시간=" << sample.avgProcessTimeMin

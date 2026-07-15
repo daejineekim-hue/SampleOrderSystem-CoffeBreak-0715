@@ -1,16 +1,13 @@
 #include "controller/ShipmentController.h"
 
 #include <iostream>
-#include <limits>
 #include <stdexcept>
+
+#include "view/ConsoleMenuIO.h"
 
 namespace sos::controller {
 
-namespace {
-
-void skipToNextLine() { std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); }
-
-}  // namespace
+using view::skipToNextLine;
 
 ShipmentController::ShipmentController(repository::OrderRepository& orderRepository)
     : orderRepository_(orderRepository) {}

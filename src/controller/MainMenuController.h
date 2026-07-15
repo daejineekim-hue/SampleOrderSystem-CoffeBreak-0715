@@ -52,10 +52,14 @@ public:
 // Invalid input shows an error and re-prompts; "0" ends run().
 class MainMenuController {
 public:
+    // dummyData is a hidden option (menu choice 9, not listed in
+    // OutputSink::showMenu's printed text) for seeding demo data
+    // (PLAN.md Phase 6).
     MainMenuController(InputSource& input, OutputSink& output, SummaryProvider& summaryProvider,
                         SubController& sampleManagement, SubController& orderIntake,
                         SubController& orderApproval, SubController& monitoring,
-                        SubController& productionLine, SubController& shipment);
+                        SubController& productionLine, SubController& shipment,
+                        SubController& dummyData);
 
     void run();
 
@@ -69,6 +73,7 @@ private:
     SubController& monitoring_;
     SubController& productionLine_;
     SubController& shipment_;
+    SubController& dummyData_;
 };
 
 }  // namespace sos::controller

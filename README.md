@@ -1,4 +1,4 @@
-# SampleOrderSystem-KimDaejin-03086508
+# SampleOrderSystem-CoffeBreak-0715
 
 반도체 시료 생산주문관리 시스템 개인과제의 **본 프로젝트(미션2)**.
 
@@ -17,10 +17,10 @@
 
 이 프로젝트는 아래 4개 PoC에서 검증한 패턴을 재사용한다.
 
-- `ConsoleMVC-KimDaejin-03086508` — MVC 계층 분리 구조
-- `DataPersistence-KimDaejin-03086508` — JSON 파일 CRUD (`JsonValue` 파서/직렬화기)
-- `DataMonitor-KimDaejin-03086508` — 실시간 콘솔 모니터링 도구
-- `DummyDataGenerator-KimDaejin-03086508` — 더미 데이터 생성 도구
+- `ConsoleMVC-CoffeBreak-0715` — MVC 계층 분리 구조
+- `DataPersistence-CoffeBreak-0715` — JSON 파일 CRUD (`JsonValue` 파서/직렬화기)
+- `DataMonitor-CoffeBreak-0715` — 실시간 콘솔 모니터링 도구
+- `DummyDataGenerator-CoffeBreak-0715` — 더미 데이터 생성 도구
 
 ## 빌드 및 실행
 
@@ -42,15 +42,17 @@
 SampleOrderSystem.sln
 src/SampleOrderSystem.vcxproj   # 프로젝트 1개
 src/main.cpp                    # App 진입점 (Debug/Release에서만 컴파일)
-src/model|view|controller|repository|production|json/   # 항상 컴파일되는 공용 로직
+src/model|view|controller|repository|production|generator|json/   # 항상 컴파일되는 공용 로직
 src/test/                       # GoogleTest/GoogleMock 테스트 (Test 구성에서만 컴파일)
 packages/                       # NuGet 패키지(gmock) 실물 — 재현성을 위해 git에 커밋됨
 ```
 
 ## 상태
 
-Phase 0(프로젝트 초기 설정) 완료 — 단일 VS 프로젝트 + Debug/Release/Test 3-구성
-구조(App/테스트를 프로젝트가 아닌 Configuration으로 전환), GoogleTest/GoogleMock
-(NuGet `gmock` 1.11.0, Test 구성에만 연결) 연동, PoC2의 JsonValue 이식 및 회귀
-테스트 포팅, 세 구성 모두 빌드·실행 검증 완료. Phase 1(Sample 도메인 & 영속성)부터
-TDD로 구현 예정.
+Phase 0~6 전체 완료 (PLAN.md 참고). 시료 등록/조회/검색, 주문 접수, 승인/거절(재고
+충분 시 즉시 확정, 부족 시 단일 FIFO 생산 라인 등록 및 지연 완료 판정), 모니터링
+(상태별 주문 집계, 재고 여유/부족/고갈 판정), 출고 처리, 콘솔 메인 메뉴 라우팅,
+더미 데이터 생성(숨김 메뉴)까지 전 기능이 GoogleTest 기반 TDD로 구현되어 있다
+(비즈니스 로직 전 계층 테스트 커버, 콘솔 I/O 자체는 `docs/FEATURES/main-menu.md`의
+Testability note에 따라 수동 검증). `SampleOrderSystem.exe`를 직접 실행해 전체
+플로우(등록 → 주문 → 승인/생산 → 모니터링 → 출고)를 확인할 수 있다.

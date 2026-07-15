@@ -117,13 +117,28 @@
       잘못된 메뉴 입력(`99`, `abc`) 후 정상 복구까지 `SampleOrderSystem.exe`
       직접 실행으로 확인
 
-## Phase 6 — Dummy 데이터 연동 & 마무리
+## Phase 6 — Dummy 데이터 연동 & 마무리 (완료)
 
-- PoC4(DummyDataGenerator)의 더미 생성 로직을 참조해 시연/테스트용 초기 데이터 생성 지원
-  (메인 앱의 숨김 메뉴 또는 별도 실행 파일 — Phase 6 시작 시 결정)
-- 전체 CleanCode 재검토 (계층 간 책임, 중복 제거, 네이밍)
-- README.md/PRD.md/PLAN.md/CLAUDE.md 최종 정합성 확인
-- 커버리지 확인 (OpenCppCoverage 사용 가능 여부 확인 후 적용)
+- [x] PoC4(DummyDataGenerator)의 더미 생성 로직을 참조해 시연/테스트용 초기 데이터 생성
+      지원 — `src/generator/DummyDataGenerator.*` (`src/test/DummyDataGeneratorTest.cpp`
+      6개: 요청 개수 생성/필드 유효성/영속화/기존 데이터 미덮어쓰기/ID 채번 연속성/
+      0건 요청). **메인 앱의 숨김 메뉴**로 결정(메뉴 번호 `9`, `MainMenuController`의
+      화면 출력 목록에는 노출되지 않지만 라우팅은 정상 동작 — `Choice9_...` 테스트로
+      커버). ID 접두사는 실제 앱 데이터(`SMP-...`)와 구분되도록 `DUMMY-###`로 채번
+- [x] 전체 CleanCode 재검토 — 5개 컨트롤러에 중복되어 있던 `skipToNextLine()` 콘솔
+      입력 헬퍼를 `src/view/ConsoleMenuIO.h`의 공용 함수로 추출
+- [x] README.md/PRD.md/PLAN.md/CLAUDE.md 최종 정합성 확인 — README의 저장소명/PoC
+      참조/상태 절을 최신화(옛 `-KimDaejin-03086508` 명명 → `-CoffeBreak-0715`), PRD의
+      Order 도메인 모델 설명을 실제 구현(생산 관련 필드는 `ProductionLine`이 보관)에
+      맞게 정정하고 [docs/adr/0001](docs/adr/0001-production-fields-live-in-productionline-not-order.md)
+      / [docs/adr/0002](docs/adr/0002-production-waiting-count-definition.md)로
+      근거를 남김, CLAUDE.md 폴더 목록에 `production`/`generator` 반영
+- [x] 커버리지 확인 (OpenCppCoverage 사용 가능 여부 확인 후 적용) — 설치 확인 후
+      Test 구성 실행 결과로 리포트 생성(로컬 산출물, `.gitignore`에 `coverage_report/`
+      추가). 모델/저장소/생산라인/모니터링 로직은 100% 근접, 전체 라인 커버리지는
+      약 68% — 나머지는 main-menu.md의 Testability note에 따라 단위테스트 범위 밖인
+      콘솔 I/O 컨트롤러(시료/주문/승인/출고 화면)에 해당하며 Phase 5에서 실제 실행
+      시나리오로 수동 검증됨
 
 ## 진행 방식 요약
 

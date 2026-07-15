@@ -1,16 +1,16 @@
 #include "controller/OrderIntakeController.h"
 
 #include <iostream>
-#include <limits>
 #include <stdexcept>
+
+#include "view/ConsoleMenuIO.h"
 
 namespace sos::controller {
 
 using model::Order;
+using view::skipToNextLine;
 
 namespace {
-
-void skipToNextLine() { std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); }
 
 void printOrder(const Order& order) {
     std::cout << "  " << order.orderId << " | 시료=" << order.sampleId << " | 고객=" << order.customerName

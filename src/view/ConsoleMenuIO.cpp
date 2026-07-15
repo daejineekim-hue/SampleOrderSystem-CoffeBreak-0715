@@ -1,10 +1,13 @@
 #include "view/ConsoleMenuIO.h"
 
 #include <iostream>
+#include <limits>
 
 namespace sos::view {
 
 using controller::MenuSummary;
+
+void skipToNextLine() { std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); }
 
 std::string ConsoleInputSource::readLine() {
     std::string line;

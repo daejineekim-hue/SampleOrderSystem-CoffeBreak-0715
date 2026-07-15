@@ -65,7 +65,8 @@ protected:
     void runWith(std::vector<std::string> inputLines) {
         input_ = std::make_unique<ScriptedInput>(std::move(inputLines));
         MainMenuController controller(*input_, output_, summary_, sampleManagement_, orderIntake_,
-                                       orderApproval_, monitoring_, productionLine_, shipment_);
+                                       orderApproval_, monitoring_, productionLine_, shipment_,
+                                       dummyData_);
         controller.run();
     }
 
@@ -78,6 +79,7 @@ protected:
     SpySubController monitoring_;
     SpySubController productionLine_;
     SpySubController shipment_;
+    SpySubController dummyData_;
 };
 
 }  // namespace
@@ -146,6 +148,18 @@ TEST_F(MainMenuControllerTest, ReturnsToMainMenuAfterSubControllerRuns) {
 
     EXPECT_EQ(sampleManagement_.callCount, 1);
     EXPECT_EQ(orderIntake_.callCount, 1);
+}
+
+TEST_F(MainMenuControllerTest, Choice9_CallsDummyDataControllerOnly) {
+    runWith({"9", "0"});
+
+    EXPECT_EQ(dummyData_.callCount, 1);
+    EXPECT_EQ(sampleManagement_.callCount, 0);
+    EXPECT_EQ(orderIntake_.callCount, 0);
+    EXPECT_EQ(orderApproval_.callCount, 0);
+    EXPECT_EQ(monitoring_.callCount, 0);
+    EXPECT_EQ(productionLine_.callCount, 0);
+    EXPECT_EQ(shipment_.callCount, 0);
 }
 
 TEST_F(MainMenuControllerTest, SummaryQueriedOnEachMenuDisplay) {

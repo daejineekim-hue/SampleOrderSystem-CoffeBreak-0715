@@ -1,3 +1,4 @@
+#include "controller/DummyDataController.h"
 #include "controller/MainMenuController.h"
 #include "controller/MenuSummaryProvider.h"
 #include "controller/MonitoringController.h"
@@ -6,6 +7,7 @@
 #include "controller/ProductionLineController.h"
 #include "controller/SampleManagementController.h"
 #include "controller/ShipmentController.h"
+#include "generator/DummyDataGenerator.h"
 #include "production/ProductionLine.h"
 #include "repository/OrderRepository.h"
 #include "repository/SampleRepository.h"
@@ -22,6 +24,8 @@ int main() {
     sos::controller::MonitoringController monitoring(sampleRepository, orderRepository);
     sos::controller::ProductionLineController productionLineView(productionLine);
     sos::controller::ShipmentController shipment(orderRepository);
+    sos::generator::DummyDataGenerator dummyDataGenerator(sampleRepository);
+    sos::controller::DummyDataController dummyData(dummyDataGenerator);
 
     sos::controller::MenuSummaryProvider summaryProvider(sampleRepository, orderRepository);
     sos::view::ConsoleInputSource input;
@@ -29,7 +33,7 @@ int main() {
 
     sos::controller::MainMenuController mainMenu(input, output, summaryProvider, sampleManagement,
                                                   orderIntake, orderApproval, monitoring,
-                                                  productionLineView, shipment);
+                                                  productionLineView, shipment, dummyData);
     mainMenu.run();
     return 0;
 }

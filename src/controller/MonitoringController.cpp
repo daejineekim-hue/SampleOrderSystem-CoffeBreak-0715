@@ -1,14 +1,15 @@
 #include "controller/MonitoringController.h"
 
 #include <iostream>
-#include <limits>
 
 #include "model/Monitoring.h"
+#include "view/ConsoleMenuIO.h"
 
 namespace sos::controller {
 
 using model::Monitoring;
 using model::StockLevel;
+using view::skipToNextLine;
 
 namespace {
 
@@ -51,7 +52,7 @@ void MonitoringController::run() {
     }
 
     std::cout << "\n계속하려면 Enter를 누르세요...";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    skipToNextLine();
 }
 
 }  // namespace sos::controller

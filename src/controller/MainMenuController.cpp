@@ -36,7 +36,8 @@ MainMenuController::MainMenuController(InputSource& input, OutputSink& output,
                                         SummaryProvider& summaryProvider,
                                         SubController& sampleManagement, SubController& orderIntake,
                                         SubController& orderApproval, SubController& monitoring,
-                                        SubController& productionLine, SubController& shipment)
+                                        SubController& productionLine, SubController& shipment,
+                                        SubController& dummyData)
     : input_(input),
       output_(output),
       summaryProvider_(summaryProvider),
@@ -45,7 +46,8 @@ MainMenuController::MainMenuController(InputSource& input, OutputSink& output,
       orderApproval_(orderApproval),
       monitoring_(monitoring),
       productionLine_(productionLine),
-      shipment_(shipment) {}
+      shipment_(shipment),
+      dummyData_(dummyData) {}
 
 void MainMenuController::run() {
     while (true) {
@@ -79,6 +81,9 @@ void MainMenuController::run() {
                 break;
             case 6:
                 shipment_.run();
+                break;
+            case 9:
+                dummyData_.run();
                 break;
             default:
                 output_.showError("유효하지 않은 메뉴 번호입니다.");

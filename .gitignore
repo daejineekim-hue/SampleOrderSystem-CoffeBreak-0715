@@ -3,3 +3,5 @@ build/
 *.user
 *.suo
 data/*.json
+coverage_report/
+LastCoverageResults.log
