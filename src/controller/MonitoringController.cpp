@@ -3,13 +3,11 @@
 #include <iostream>
 
 #include "model/Monitoring.h"
-#include "view/ConsoleMenuIO.h"
 
 namespace sos::controller {
 
 using model::Monitoring;
 using model::StockLevel;
-using view::skipToNextLine;
 
 namespace {
 
@@ -50,9 +48,6 @@ void MonitoringController::run() {
                    << " | 대기수요=" << status.pendingDemand << " | 상태=" << levelToKorean(status.level)
                    << "\n";
     }
-
-    std::cout << "\n계속하려면 Enter를 누르세요...";
-    skipToNextLine();
 }
 
 }  // namespace sos::controller

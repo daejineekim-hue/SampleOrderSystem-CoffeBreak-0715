@@ -47,7 +47,7 @@ $result = Invoke-Scenario @(
     "1", "1", "SMP-001", "Wafer-A", "20", "0.9", "100", "0",
     "2", "1", "SMP-001", "customer-A", "10", "0",
     "3", "2", $order1, "1", "0",
-    "4", "0",
+    "4",
     "6", "2", $order1, "0",
     "0"
 )
@@ -75,7 +75,7 @@ $result = Invoke-Scenario @(
     "1", "1", "SMP-001", "Wafer-A", "20", "0.92", "30", "0",
     "2", "1", "SMP-001", "customer-A", "80", "0",
     "3", "2", $order1, "1", "0",
-    "5", "0",
+    "5",
     "0"
 )
 Assert-Contains $result.Output "처리되었습니다. 상태: PRODUCING" "S2-insufficient-stock"
@@ -87,7 +87,7 @@ $result = Invoke-Scenario @(
     "1", "1", "SMP-001", "Wafer-A", "20", "0.9", "50", "0",
     "2", "1", "SMP-001", "customer-A", "10", "0",
     "3", "2", $order1, "2", "0",
-    "4", "0",
+    "4",
     "0"
 )
 Assert-Contains $result.Output "거절되었습니다" "S3-reject"
@@ -115,6 +115,21 @@ $result = Invoke-Scenario @("0")
 Assert-Contains $result.Output "시스템을 종료합니다" "S6-immediate-exit"
 Assert-True ($result.ExitCode -eq 0) "즉시 종료 시 비정상 종료 코드: $($result.ExitCode)" "S6-immediate-exit"
 
+# ---- 시나리오 7: 1회성 화면(생산라인 조회/모니터링) 뒤 다음 입력이 씹히지 않아야 함 ----
+# 회귀: MainMenuController는 getline()으로 메뉴 번호를 읽어 개행을 이미 소비하는데,
+# ProductionLineController/MonitoringController가 화면 끝에서 또 skipToNextLine()을
+# 호출하면 남아있는 개행이 없어 사용자의 "다음" 실제 입력 한 줄을 통째로 삼켜버린다.
+$result = Invoke-Scenario @(
+    "1", "1", "SMP-001", "Wafer-A", "20", "0.9", "100", "0",
+    "5",
+    "4",
+    "0"
+)
+Assert-Contains $result.Output "생산라인 조회" "S7-no-input-swallowed-after-oneshot-screen"
+Assert-Contains $result.Output "주문량 확인" "S7-no-input-swallowed-after-oneshot-screen"
+Assert-Contains $result.Output "시스템을 종료합니다" "S7-no-input-swallowed-after-oneshot-screen"
+Assert-True ($result.ExitCode -eq 0) "예상치 못한 종료 코드: $($result.ExitCode)" "S7-no-input-swallowed-after-oneshot-screen"
+
 Remove-Item $samplesFile, $ordersFile -ErrorAction SilentlyContinue
 
 if ($script:failures.Count -gt 0) {
@@ -123,4 +138,4 @@ if ($script:failures.Count -gt 0) {
     exit 1
 }
 
-Write-Output "`n모든 시스템 테스트 통과 (6개 시나리오)"
+Write-Output "`n모든 시스템 테스트 통과 (7개 시나리오)"

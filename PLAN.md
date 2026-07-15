@@ -188,6 +188,24 @@ Phase 0~7로 기능 요구사항은 모두 구현되었으나, TDD로 기능을 
 - [x] 매 항목 적용 후 `test.ps1`(GoogleTest 113개), 항목 3 이후 `system-test.ps1`
       (6개 시나리오)까지 재실행해 최종 회귀 없음 확인.
 
+## Phase 9 — 버그 수정: 메인 메뉴 입력 씹힘 (완료)
+
+Phase 8 리팩토링 직후 실제 exe로 생산라인 완료를 데모하다가 발견한 버그를 수정한
+단계. 메인 메뉴에서 `[4] 모니터링`/`[5] 생산라인 조회`를 연 뒤 바로 다음 실제
+입력이 씹히는 문제가 있었다. `MainMenuController`는 `getline()`으로 메뉴 번호를
+읽어 개행을 이미 소비하는데, `MonitoringController`/`ProductionLineController`가
+화면 끝에서 "계속하려면 Enter를 누르세요..." + `skipToNextLine()`을 호출하면
+남은 개행이 없어 사용자의 다음 실제 입력 한 줄을 그대로 삼켜버렸다
+(`DummyDataController`는 자기 자신의 `cin >> count` 뒤에 오는 개행을 치우는
+것이므로 정상). `system-test.ps1`의 기존 시나리오들은 우연히 넣어둔 여분의
+`"0"`이 희생양으로 먹히는 바람에 이 버그를 못 잡고 있었다.
+
+- [x] `system-test.ps1`에 시나리오 7 추가(`"5"` 다음 `"4"`를 바로 입력해 두 화면이
+      모두 정상 표시되는지 확인)로 RED 재현 후, 두 컨트롤러의 불필요한 트레일링
+      `skipToNextLine()` 호출을 제거해 GREEN 확인. 기존 시나리오 1~3에 있던, 이
+      버그에 의존해 우연히 통과하던 여분의 `"0"`도 함께 제거.
+- [x] `test.ps1`(GoogleTest 113개) + `system-test.ps1`(7개 시나리오) 전체 재확인.
+
 ## 진행 방식 요약
 
 각 Phase 내부는 `.claude/skills/test-driven-development/SKILL.md`의 Red-Green-Refactor

@@ -2,11 +2,7 @@
 
 #include <iostream>
 
-#include "view/ConsoleMenuIO.h"
-
 namespace sos::controller {
-
-using view::skipToNextLine;
 
 ProductionLineController::ProductionLineController(production::ProductionLine& productionLine)
     : productionLine_(productionLine) {}
@@ -32,9 +28,6 @@ void ProductionLineController::run() {
         for (const auto& orderId : waiting) std::cout << orderId << " ";
         std::cout << "\n";
     }
-
-    std::cout << "\n계속하려면 Enter를 누르세요...";
-    skipToNextLine();
 }
 
 }  // namespace sos::controller
