@@ -31,13 +31,18 @@
 - [x] `build.ps1 -Configuration <Debug|Release|Test>`/`test.ps1` 커맨드라인 스크립트로
   세 Configuration 빌드·테스트 파이프라인 검증
 
-## Phase 1 — Sample 도메인 & 영속성
+## Phase 1 — Sample 도메인 & 영속성 (완료)
 
 대상 문서: [docs/FEATURES/sample-management.md](docs/FEATURES/sample-management.md)
 
-- `Sample` 모델 + 검증 규칙 TDD 구현
-- `SampleRepository` (JSON 파일 CRUD, PoC2 패턴 확장) TDD 구현
-- 시료 등록/조회/검색 Controller-level 로직 TDD 구현 (View는 아직 콘솔 출력 붙이지 않아도 됨 — 로직만)
+- [x] `Sample` 모델 + 검증 규칙 TDD 구현 (`src/model/Sample.*`, `src/test/SampleTest.cpp` 11개)
+- [x] `SampleRepository` (JSON 파일 CRUD, PoC2 패턴 확장) TDD 구현
+      (`src/repository/SampleRepository.*`, `src/test/SampleRepositoryTest.cpp` 13개:
+      등록/중복거부/조회/재고반영/검색 6종/영속성)
+- 등록/조회/검색의 실제 비즈니스 로직(검증, 중복 거부, 부분 문자열 검색)은 이미
+  `SampleRepository`에 전부 구현·테스트되어 있어, 별도의 얇은 Controller는 지금 추가하지
+  않는다 (View가 없는 상태에서 패스스루 Controller를 먼저 만들면 TDD 원칙에 어긋남).
+  Controller/View 배선은 Phase 5(메인 메뉴 통합)에서 실제 입출력이 필요한 시점에 추가한다.
 
 ## Phase 2 — Order 도메인 & 접수
 
