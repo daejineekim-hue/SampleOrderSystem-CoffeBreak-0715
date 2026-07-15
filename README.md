@@ -24,9 +24,27 @@
 
 ## 빌드 및 실행
 
-(Phase 0 완료 후 작성 예정: Visual Studio 솔루션 열기 / MSBuild 명령 / 테스트 실행 명령)
+Visual Studio에서 `SampleOrderSystem.sln`을 직접 열어 빌드/실행해도 되고, 커맨드라인에서는:
+
+```powershell
+./build.ps1     # App.exe + Tests.exe 빌드 (build/x64/Debug/)
+./test.ps1      # 빌드 후 Tests.exe 실행 (GoogleTest)
+./build/x64/Debug/App.exe
+```
+
+## 프로젝트 구조
+
+```
+SampleOrderSystem.sln
+src/Core/     # 정적 라이브러리: model/view/controller/repository/production/json
+src/App/      # 콘솔 실행파일 (main.cpp), Core 참조
+test/         # GoogleTest/GoogleMock 실행파일, Core 참조 (NuGet gmock 1.11.0 사용)
+packages/     # NuGet 패키지(gmock) 실물 — 재현성을 위해 git에 커밋됨
+```
 
 ## 상태
 
-현재 준비 단계 — 문서(PRD/PLAN/CLAUDE.md/FEATURES) 작성 완료, Phase 0(프로젝트 초기
-설정)부터 순차 구현 예정.
+Phase 0(프로젝트 초기 설정) 완료 — VS 솔루션/프로젝트 3개(Core/App/Tests) 구성,
+GoogleTest/GoogleMock(NuGet `gmock` 1.11.0, Tests 프로젝트에만 참조) 연동, PoC2의
+JsonValue 이식 및 회귀 테스트 포팅, 빌드·테스트 파이프라인 전체 검증 완료.
+Phase 1(Sample 도메인 & 영속성)부터 TDD로 구현 예정.

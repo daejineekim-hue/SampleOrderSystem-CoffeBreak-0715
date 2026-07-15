@@ -13,17 +13,18 @@
 - 디렉터리 구조: `src/model`, `src/view`, `src/controller`, `src/repository`,
   `src/production`, `src/json`, `include/`(또는 헤더를 src와 동일 폴더에 둘지 결정),
   `test/`(GoogleTest 프로젝트, 별도 vcxproj)
-- GoogleTest 통합 방법 결정 및 적용 (NuGet 패키지 `Microsoft.googletest.v143.windesktop.msvcstl.static.rt-dyn`
-  또는 vcpkg — 이번 환경엔 vcpkg 미설치 확인되어 NuGet 우선 검토)
+- GoogleTest/GoogleMock 통합: NuGet 패키지 `gmock` 1.11.0 (test 프로젝트에만 참조,
+  `packages/`는 재현성을 위해 git에 커밋). vcpkg는 이 환경에 미설치.
 - PoC1(ConsoleMVC)의 MVC 스켈레톤을 참조해 최소 골격 이식 (Sample 등록/조회 정도까지, 아직 영속성 없음)
-- PoC2(DataPersistence)의 `JsonValue` 구현을 `src/json/`으로 vendoring
-- `main` 프로젝트와 `test` 프로젝트가 각각 devenv/MSBuild로 빌드되는지 확인 (Hello World 수준 테스트 1개로 파이프라인 검증)
+- PoC2(DataPersistence)의 `JsonValue` 구현을 `src/Core/json/`으로 vendoring
+- `App` 프로젝트와 `Tests` 프로젝트가 각각 MSBuild로 빌드되는지 확인 (스모크 테스트로 파이프라인 검증)
 
 **TODO**
-- [ ] .sln/.vcxproj 생성
-- [ ] GoogleTest 참조 추가 및 더미 테스트 1개 통과 확인
-- [ ] MVC 폴더 구조 생성 (PoC1 참조)
-- [ ] JsonValue vendoring (PoC2 참조) + 파싱/직렬화 단위테스트 이식
+- [x] .sln/.vcxproj 생성 (Core 정적 라이브러리 + App + Tests, 3-프로젝트 구조)
+- [x] GoogleTest/GoogleMock 참조 추가(NuGet `gmock` 1.11.0) 및 스모크 테스트 통과 확인
+- [x] MVC 폴더 구조 생성 (`src/Core/{model,view,controller,repository,production}`, PoC1 참조)
+- [x] JsonValue vendoring (PoC2 참조) + 파싱/직렬화 회귀 테스트 포팅 (`test/JsonValueTest.cpp`)
+- [x] `build.ps1`/`test.ps1` 커맨드라인 스크립트로 빌드·테스트 파이프라인 검증
 
 ## Phase 1 — Sample 도메인 & 영속성
 
