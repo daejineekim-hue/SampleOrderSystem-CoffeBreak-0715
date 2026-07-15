@@ -59,7 +59,7 @@
       (정상 접수/순번 증가/존재하지 않는 sampleId/수량 0·음수/고객명 빈값·공백/
       날짜 변경 시 순번 초기화/검증 실패 시 순번 미소비/재시작 후 영속성)
 
-## Phase 3 — 주문 승인/거절 & 생산 라인
+## Phase 3 — 주문 승인/거절 & 생산 라인 (완료)
 
 대상 문서: [docs/FEATURES/order-approval.md](docs/FEATURES/order-approval.md),
 [docs/FEATURES/production-line.md](docs/FEATURES/production-line.md)
@@ -67,9 +67,17 @@
 가장 로직이 복잡한 Phase. 두 문서를 하나의 Phase로 묶은 이유: 승인 시 재고부족 분기가
 곧바로 생산 큐 등록으로 이어지므로 분리 구현 시 중간 상태가 무의미해짐.
 
-- 승인(재고충분/부족 분기), 거절 로직 TDD 구현
-- `ProductionLine` (FIFO 큐, `advanceIfDue()` 경과시간 판정) TDD 구현 — 가짜 시계(주입 가능한 clock)로 실제 대기 없이 테스트
-- 실생산량/총생산시간 공식 경계값 테스트 (공식 문서의 worked example 그대로 재현)
+- [x] 승인(재고충분/부족 분기), 거절 로직 TDD 구현 — `OrderRepository::approve/reject`
+      (`src/test/OrderApprovalTest.cpp` 16개: 재고충분/경계값/재고부족/거절/이미
+      확정·거절·생산중인 주문에 대한 재승인·재거절 거부/존재하지 않는 주문ID)
+- [x] `ProductionLine` (FIFO 큐, `advanceIfDue()` 경과시간 판정) TDD 구현
+      (`src/production/ProductionLine.*`, `src/test/ProductionLineTest.cpp` 14개) —
+      가짜 시계(주입 가능한 clock)로 실제 대기 없이 테스트. 큐는 주문 id만 보관하고
+      매 조회 시 `OrderRepository::findById`로 최신 정보를 조회 (Order 확장 필드를
+      Order 모델에 추가하지 않고 ProductionLine 내부 QueueEntry에 캡슐화)
+- [x] 실생산량/총생산시간 공식 경계값 테스트 (공식 문서의 worked example 그대로 재현) —
+      `WorkedExample_Shortage50_Yield092`(61개/1220분), `ExactDivision_DoesNotOverRound`
+      (부동소수점 올림 오차 방지, 100개로 정확히 나누어떨어짐)
 
 ## Phase 4 — 모니터링 & 출고 처리
 

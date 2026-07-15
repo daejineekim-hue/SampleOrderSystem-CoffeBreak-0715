@@ -8,6 +8,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "production/ProductionLine.h"
+
 namespace sos::repository {
 
 using json::JsonValue;
@@ -128,5 +130,76 @@ const Order& OrderRepository::registerOrder(const std::string& sampleId,
 }
 
 std::vector<Order> OrderRepository::findAll() const { return orders_; }
+
+const Order* OrderRepository::findById(const std::string& orderId) const {
+    for (const auto& order : orders_) {
+        if (order.orderId == orderId) return &order;
+    }
+    return nullptr;
+}
+
+Order* OrderRepository::findMutable(const std::string& orderId) {
+    for (auto& order : orders_) {
+        if (order.orderId == orderId) return &order;
+    }
+    return nullptr;
+}
+
+const Order& OrderRepository::approve(const std::string& orderId,
+                                       production::ProductionLine& productionLine) {
+    Order* order = findMutable(orderId);
+    if (!order) throw std::invalid_argument("존재하지 않는 주문 ID입니다: " + orderId);
+    if (order->status != OrderStatus::RESERVED) {
+        throw std::invalid_argument("RESERVED 상태의 주문만 승인할 수 있습니다: " + orderId);
+    }
+
+    int currentStock = 0;
+    for (const auto& sample : sampleRepository_.findAll()) {
+        if (sample.id == order->sampleId) {
+            currentStock = sample.stock;
+            break;
+        }
+    }
+
+    if (currentStock >= order->quantity) {
+        order->status = OrderStatus::CONFIRMED;
+        sampleRepository_.updateStock(order->sampleId, currentStock - order->quantity);
+        save();
+    } else {
+        order->status = OrderStatus::PRODUCING;
+        save();
+        productionLine.enqueue(orderId);
+    }
+    return *order;
+}
+
+const Order& OrderRepository::reject(const std::string& orderId) {
+    Order* order = findMutable(orderId);
+    if (!order) throw std::invalid_argument("존재하지 않는 주문 ID입니다: " + orderId);
+    if (order->status != OrderStatus::RESERVED) {
+        throw std::invalid_argument("RESERVED 상태의 주문만 거절할 수 있습니다: " + orderId);
+    }
+    order->status = OrderStatus::REJECTED;
+    save();
+    return *order;
+}
+
+const Order& OrderRepository::completeProduction(const std::string& orderId, int producedTotal) {
+    Order* order = findMutable(orderId);
+    if (!order) throw std::invalid_argument("존재하지 않는 주문 ID입니다: " + orderId);
+
+    int currentStock = 0;
+    for (const auto& sample : sampleRepository_.findAll()) {
+        if (sample.id == order->sampleId) {
+            currentStock = sample.stock;
+            break;
+        }
+    }
+
+    order->status = OrderStatus::CONFIRMED;
+    sampleRepository_.updateStock(order->sampleId, currentStock + producedTotal - order->quantity);
+    save();
+    return *order;
+}
 
 }  // namespace sos::repository
