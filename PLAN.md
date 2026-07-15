@@ -98,14 +98,24 @@
       재고 재차감 없음 확인/RESERVED·PRODUCING·RELEASE·REJECTED 상태에서 거부/
       존재하지 않는 주문 ID/CONFIRMED만 필터링하는 목록 조회)
 
-## Phase 5 — 메인 메뉴 통합 (콘솔 View/Controller 배선)
+## Phase 5 — 메인 메뉴 통합 (콘솔 View/Controller 배선) (완료)
 
 대상 문서: [docs/FEATURES/main-menu.md](docs/FEATURES/main-menu.md)
 
-- 지금까지 로직 레이어(Phase 1~4)에 콘솔 View/Controller를 배선
-- 메뉴 라우팅은 단위테스트로 커버 (가짜 입력 소스 주입), 콘솔 출력 포맷 자체는 수동 검증
-- PDF의 예시 UI 시나리오를 실제로 재현해 수동 검증 (주문 승인 재고부족 처리, FIFO 대기열,
-  모니터링 표시, 출고 처리)
+- [x] 지금까지 로직 레이어(Phase 1~4)에 콘솔 View/Controller를 배선 —
+      `SampleManagementController`/`OrderIntakeController`/`OrderApprovalController`/
+      `MonitoringController`/`ProductionLineController`/`ShipmentController` 6종 신설,
+      각각 해당 Repository/Model만 호출 (자체 비즈니스 로직 없음)
+- [x] 메뉴 라우팅은 단위테스트로 커버 (가짜 입력 소스 주입) —
+      `MainMenuController` (`src/test/MainMenuControllerTest.cpp` 8개: 1~6 라우팅/
+      범위 밖 숫자·비숫자 입력 오류 후 재입력/정상 복구/`0` 종료/하위 기능 후 메인
+      메뉴 복귀/요약 정보 매 진입 시 조회). 콘솔 출력 포맷 자체는 수동 검증 범위
+      (`ConsoleInputSource`/`ConsoleOutputSink`, `src/view/ConsoleMenuIO.*`)
+- [x] PDF의 예시 UI 시나리오를 실제로 재현해 수동 검증 — 시료 등록 → 주문 접수 →
+      승인(재고충분 즉시 CONFIRMED/재고부족 PRODUCING 생산큐 등록, 실생산량·생산시간
+      공식 실측 확인) → 모니터링(주문량/재고상태) → 생산라인 조회 → 출고 처리,
+      잘못된 메뉴 입력(`99`, `abc`) 후 정상 복구까지 `SampleOrderSystem.exe`
+      직접 실행으로 확인
 
 ## Phase 6 — Dummy 데이터 연동 & 마무리
 

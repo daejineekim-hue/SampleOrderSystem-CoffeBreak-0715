@@ -93,6 +93,15 @@
     <ClInclude Include="repository\OrderRepository.h" />
     <ClInclude Include="production\ProductionLine.h" />
     <ClInclude Include="model\Monitoring.h" />
+    <ClInclude Include="controller\MainMenuController.h" />
+    <ClInclude Include="controller\MenuSummaryProvider.h" />
+    <ClInclude Include="controller\SampleManagementController.h" />
+    <ClInclude Include="controller\OrderIntakeController.h" />
+    <ClInclude Include="controller\OrderApprovalController.h" />
+    <ClInclude Include="controller\MonitoringController.h" />
+    <ClInclude Include="controller\ProductionLineController.h" />
+    <ClInclude Include="controller\ShipmentController.h" />
+    <ClInclude Include="view\ConsoleMenuIO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="json\JsonValue.cpp" />
@@ -102,6 +111,15 @@
     <ClCompile Include="repository\OrderRepository.cpp" />
     <ClCompile Include="production\ProductionLine.cpp" />
     <ClCompile Include="model\Monitoring.cpp" />
+    <ClCompile Include="controller\MainMenuController.cpp" />
+    <ClCompile Include="controller\MenuSummaryProvider.cpp" />
+    <ClCompile Include="controller\SampleManagementController.cpp" />
+    <ClCompile Include="controller\OrderIntakeController.cpp" />
+    <ClCompile Include="controller\OrderApprovalController.cpp" />
+    <ClCompile Include="controller\MonitoringController.cpp" />
+    <ClCompile Include="controller\ProductionLineController.cpp" />
+    <ClCompile Include="controller\ShipmentController.cpp" />
+    <ClCompile Include="view\ConsoleMenuIO.cpp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -131,6 +149,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="test\ShipmentTest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="test\MainMenuControllerTest.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\packages\gmock.1.11.0\lib\native\src\gmock\src\gmock_main.cc">
