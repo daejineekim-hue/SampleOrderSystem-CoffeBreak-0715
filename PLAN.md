@@ -79,14 +79,24 @@
       `WorkedExample_Shortage50_Yield092`(61개/1220분), `ExactDivision_DoesNotOverRound`
       (부동소수점 올림 오차 방지, 100개로 정확히 나누어떨어짐)
 
-## Phase 4 — 모니터링 & 출고 처리
+## Phase 4 — 모니터링 & 출고 처리 (완료)
 
 대상 문서: [docs/FEATURES/monitoring.md](docs/FEATURES/monitoring.md),
 [docs/FEATURES/shipment.md](docs/FEATURES/shipment.md)
 
-- 상태별 주문 수 집계 TDD 구현
-- 재고 상태(여유/부족/고갈) 판정 TDD 구현
-- 출고 처리(CONFIRMED → RELEASE) TDD 구현
+- [x] 상태별 주문 수 집계 TDD 구현 — `Monitoring::countByStatus`
+      (`src/model/Monitoring.*`, `src/test/MonitoringTest.cpp` 중 5개: 정상 집계/
+      REJECTED 제외/특정 상태 0건/전체 0건/여러 시료 합산). 순수 함수로 구현하여
+      Order/Sample 목록만 받고 저장소 의존 없음 (model 계층 규칙 준수)
+- [x] 재고 상태(여유/부족/고갈) 판정 TDD 구현 — `Monitoring::stockStatus`
+      (`src/test/MonitoringTest.cpp` 나머지 12개: 여유/부족/경계값(동률=여유)/
+      고갈 우선순위/CONFIRMED·RELEASE·REJECTED 제외/여러 대기주문 합산/
+      시료 없음/여러 시료 독립 판정). monitoring.md의 "설계 결정" 절이 정의한
+      pendingDemand 규칙을 그대로 구현
+- [x] 출고 처리(CONFIRMED → RELEASE) TDD 구현 — `OrderRepository::release`/
+      `findShippable` (`src/test/ShipmentTest.cpp` 13개: 정상 전이/독립성/
+      재고 재차감 없음 확인/RESERVED·PRODUCING·RELEASE·REJECTED 상태에서 거부/
+      존재하지 않는 주문 ID/CONFIRMED만 필터링하는 목록 조회)
 
 ## Phase 5 — 메인 메뉴 통합 (콘솔 View/Controller 배선)
 

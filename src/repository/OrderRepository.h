@@ -55,6 +55,16 @@ public:
     // public API surface.
     const model::Order& completeProduction(const std::string& orderId, int producedTotal);
 
+    // Executes shipment for a CONFIRMED order (docs/FEATURES/shipment.md):
+    // transitions CONFIRMED -> RELEASE. Does not touch sample stock (already
+    // deducted at approval/production-completion time). Throws
+    // std::invalid_argument if orderId doesn't exist or the order is not
+    // currently CONFIRMED.
+    const model::Order& release(const std::string& orderId);
+
+    // Orders currently eligible for shipment (status == CONFIRMED).
+    std::vector<model::Order> findShippable() const;
+
 private:
     std::string filePath_;
     SampleRepository& sampleRepository_;

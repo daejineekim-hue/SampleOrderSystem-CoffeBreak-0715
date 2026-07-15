@@ -92,6 +92,7 @@
     <ClInclude Include="repository\SampleRepository.h" />
     <ClInclude Include="repository\OrderRepository.h" />
     <ClInclude Include="production\ProductionLine.h" />
+    <ClInclude Include="model\Monitoring.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="json\JsonValue.cpp" />
@@ -100,6 +101,7 @@
     <ClCompile Include="repository\SampleRepository.cpp" />
     <ClCompile Include="repository\OrderRepository.cpp" />
     <ClCompile Include="production\ProductionLine.cpp" />
+    <ClCompile Include="model\Monitoring.cpp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -123,6 +125,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="test\ProductionLineTest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="test\MonitoringTest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="test\ShipmentTest.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\packages\gmock.1.11.0\lib\native\src\gmock\src\gmock_main.cc">
