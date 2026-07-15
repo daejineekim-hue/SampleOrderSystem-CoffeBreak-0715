@@ -44,13 +44,20 @@
   않는다 (View가 없는 상태에서 패스스루 Controller를 먼저 만들면 TDD 원칙에 어긋남).
   Controller/View 배선은 Phase 5(메인 메뉴 통합)에서 실제 입출력이 필요한 시점에 추가한다.
 
-## Phase 2 — Order 도메인 & 접수
+## Phase 2 — Order 도메인 & 접수 (완료)
 
 대상 문서: [docs/FEATURES/order-intake.md](docs/FEATURES/order-intake.md)
 
-- `Order` 모델 + 주문번호 채번 규칙 TDD 구현
-- `OrderRepository` (JSON 파일 CRUD) TDD 구현
-- 주문 접수(RESERVED 생성) 로직 TDD 구현 — Sample 존재 검증은 Phase 1의 SampleRepository에 의존
+- [x] `Order` 모델 + 주문번호 채번 규칙 TDD 구현 (`src/model/Order.*`)
+      — 채번은 별도 카운터를 저장하지 않고, 같은 날짜(`ORD-YYYYMMDD-`) 접두사를 가진
+      기존 주문 중 최대 순번 다음 값으로 즉석 계산 (검증 실패 시 순번 미소비가 자동 보장됨)
+- [x] `OrderRepository` (JSON 파일 CRUD) TDD 구현 (`src/repository/OrderRepository.*`)
+      — sampleId 존재 검증(SampleRepository 참조), quantity>0, customerName
+      trim 후 비어있지 않음 검증. 시간은 `Clock`(`std::function`)으로 주입 가능해
+      날짜 경계(자정 등)를 실제 대기 없이 테스트
+- [x] `src/test/OrderRepositoryTest.cpp` (10개): AC-1~AC-9 전체
+      (정상 접수/순번 증가/존재하지 않는 sampleId/수량 0·음수/고객명 빈값·공백/
+      날짜 변경 시 순번 초기화/검증 실패 시 순번 미소비/재시작 후 영속성)
 
 ## Phase 3 — 주문 승인/거절 & 생산 라인
 

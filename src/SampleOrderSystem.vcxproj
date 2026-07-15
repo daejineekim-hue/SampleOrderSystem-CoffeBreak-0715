@@ -88,12 +88,16 @@
          always compiled, regardless of configuration. -->
     <ClInclude Include="json\JsonValue.h" />
     <ClInclude Include="model\Sample.h" />
+    <ClInclude Include="model\Order.h" />
     <ClInclude Include="repository\SampleRepository.h" />
+    <ClInclude Include="repository\OrderRepository.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="json\JsonValue.cpp" />
     <ClCompile Include="model\Sample.cpp" />
+    <ClCompile Include="model\Order.cpp" />
     <ClCompile Include="repository\SampleRepository.cpp" />
+    <ClCompile Include="repository\OrderRepository.cpp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -108,6 +112,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="test\SampleRepositoryTest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="test\OrderRepositoryTest.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\packages\gmock.1.11.0\lib\native\src\gmock\src\gmock_main.cc">
