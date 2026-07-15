@@ -9,22 +9,27 @@
 
 ## Phase 0 — 프로젝트 초기 설정
 
-- Visual Studio 2026(v18) C++ 콘솔 프로젝트 생성 (.sln + .vcxproj)
-- 디렉터리 구조: `src/model`, `src/view`, `src/controller`, `src/repository`,
-  `src/production`, `src/json`, `include/`(또는 헤더를 src와 동일 폴더에 둘지 결정),
-  `test/`(GoogleTest 프로젝트, 별도 vcxproj)
-- GoogleTest/GoogleMock 통합: NuGet 패키지 `gmock` 1.11.0 (test 프로젝트에만 참조,
-  `packages/`는 재현성을 위해 git에 커밋). vcpkg는 이 환경에 미설치.
+- Visual Studio 2026(v18) C++ 콘솔 프로젝트 생성. **프로젝트는 `src/SampleOrderSystem.vcxproj`
+  하나뿐**이며, Debug/Release(App)와 Test(GoogleTest) 구분은 별도 프로젝트가 아니라
+  MSBuild Configuration(`Debug|x64`/`Release|x64`/`Test|x64`)으로 처리한다 (파일별
+  `ExcludedFromBuild` 조건으로 App 전용/테스트 전용 소스를 구성별로 제외).
+- 디렉터리 구조(모두 `src/` 하나 아래, 프로젝트 분리 없음): `src/model`, `src/view`,
+  `src/controller`, `src/repository`, `src/production`, `src/json`, `src/test`
+- GoogleTest/GoogleMock 통합: NuGet 패키지 `gmock` 1.11.0. `gmock.targets` import 자체를
+  `Condition="'$(Configuration)'=='Test'"`로 걸어 Debug/Release 빌드에는 테스트
+  프레임워크가 전혀 링크되지 않게 한다. `packages/`는 재현성을 위해 git에 커밋
+  (vcpkg는 이 환경에 미설치, nuget restore 신뢰 불가).
 - PoC1(ConsoleMVC)의 MVC 스켈레톤을 참조해 최소 골격 이식 (Sample 등록/조회 정도까지, 아직 영속성 없음)
-- PoC2(DataPersistence)의 `JsonValue` 구현을 `src/Core/json/`으로 vendoring
-- `App` 프로젝트와 `Tests` 프로젝트가 각각 MSBuild로 빌드되는지 확인 (스모크 테스트로 파이프라인 검증)
+- PoC2(DataPersistence)의 `JsonValue` 구현을 `src/json/`으로 vendoring
+- Debug/Release/Test 세 Configuration이 모두 MSBuild로 빌드되는지 확인 (스모크 테스트로 파이프라인 검증)
 
 **TODO**
-- [x] .sln/.vcxproj 생성 (Core 정적 라이브러리 + App + Tests, 3-프로젝트 구조)
-- [x] GoogleTest/GoogleMock 참조 추가(NuGet `gmock` 1.11.0) 및 스모크 테스트 통과 확인
-- [x] MVC 폴더 구조 생성 (`src/Core/{model,view,controller,repository,production}`, PoC1 참조)
-- [x] JsonValue vendoring (PoC2 참조) + 파싱/직렬화 회귀 테스트 포팅 (`test/JsonValueTest.cpp`)
-- [x] `build.ps1`/`test.ps1` 커맨드라인 스크립트로 빌드·테스트 파이프라인 검증
+- [x] .sln/.vcxproj 생성 (단일 프로젝트 + Debug/Release/Test 3-Configuration 구조)
+- [x] GoogleTest/GoogleMock 참조 추가(NuGet `gmock` 1.11.0, Test 구성 전용) 및 스모크 테스트 통과 확인
+- [x] MVC 폴더 구조 생성 (`src/{model,view,controller,repository,production}`, PoC1 참조)
+- [x] JsonValue vendoring (PoC2 참조) + 파싱/직렬화 회귀 테스트 포팅 (`src/test/JsonValueTest.cpp`)
+- [x] `build.ps1 -Configuration <Debug|Release|Test>`/`test.ps1` 커맨드라인 스크립트로
+  세 Configuration 빌드·테스트 파이프라인 검증
 
 ## Phase 1 — Sample 도메인 & 영속성
 

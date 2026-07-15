@@ -24,27 +24,33 @@
 
 ## 빌드 및 실행
 
-Visual Studio에서 `SampleOrderSystem.sln`을 직접 열어 빌드/실행해도 되고, 커맨드라인에서는:
+프로젝트는 **하나**(`src/SampleOrderSystem.vcxproj`)이고, Configuration으로 App/테스트를
+구분한다. Visual Studio에서 `SampleOrderSystem.sln`을 열고 상단 툴바에서 구성을
+`Debug`/`Release`(App 실행) 또는 `Test`(GoogleTest 실행)로 바꿔 F5하면 된다.
+
+커맨드라인에서는:
 
 ```powershell
-./build.ps1     # App.exe + Tests.exe 빌드 (build/x64/Debug/)
-./test.ps1      # 빌드 후 Tests.exe 실행 (GoogleTest)
-./build/x64/Debug/App.exe
+./build.ps1 -Configuration Debug    # App 빌드 (build/x64/Debug/SampleOrderSystem.exe)
+./build.ps1 -Configuration Test     # 테스트만 빌드 (build/x64/Test/SampleOrderSystem.exe)
+./test.ps1                          # Test 구성 빌드 + 즉시 실행
 ```
 
 ## 프로젝트 구조
 
 ```
 SampleOrderSystem.sln
-src/Core/     # 정적 라이브러리: model/view/controller/repository/production/json
-src/App/      # 콘솔 실행파일 (main.cpp), Core 참조
-test/         # GoogleTest/GoogleMock 실행파일, Core 참조 (NuGet gmock 1.11.0 사용)
-packages/     # NuGet 패키지(gmock) 실물 — 재현성을 위해 git에 커밋됨
+src/SampleOrderSystem.vcxproj   # 프로젝트 1개
+src/main.cpp                    # App 진입점 (Debug/Release에서만 컴파일)
+src/model|view|controller|repository|production|json/   # 항상 컴파일되는 공용 로직
+src/test/                       # GoogleTest/GoogleMock 테스트 (Test 구성에서만 컴파일)
+packages/                       # NuGet 패키지(gmock) 실물 — 재현성을 위해 git에 커밋됨
 ```
 
 ## 상태
 
-Phase 0(프로젝트 초기 설정) 완료 — VS 솔루션/프로젝트 3개(Core/App/Tests) 구성,
-GoogleTest/GoogleMock(NuGet `gmock` 1.11.0, Tests 프로젝트에만 참조) 연동, PoC2의
-JsonValue 이식 및 회귀 테스트 포팅, 빌드·테스트 파이프라인 전체 검증 완료.
-Phase 1(Sample 도메인 & 영속성)부터 TDD로 구현 예정.
+Phase 0(프로젝트 초기 설정) 완료 — 단일 VS 프로젝트 + Debug/Release/Test 3-구성
+구조(App/테스트를 프로젝트가 아닌 Configuration으로 전환), GoogleTest/GoogleMock
+(NuGet `gmock` 1.11.0, Test 구성에만 연결) 연동, PoC2의 JsonValue 이식 및 회귀
+테스트 포팅, 세 구성 모두 빌드·실행 검증 완료. Phase 1(Sample 도메인 & 영속성)부터
+TDD로 구현 예정.

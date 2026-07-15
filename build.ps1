@@ -1,4 +1,5 @@
 param(
+    [ValidateSet("Debug", "Release", "Test")]
     [string]$Configuration = "Debug"
 )
 $ErrorActionPreference = "Stop"
@@ -11,4 +12,4 @@ if (-not (Test-Path $msbuild)) {
 & $msbuild "$PSScriptRoot\SampleOrderSystem.sln" /p:Configuration=$Configuration /p:Platform=x64 /m /nologo /v:minimal
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 
-Write-Output "Build succeeded: build\x64\$Configuration\App.exe"
+Write-Output "Build succeeded: build\x64\$Configuration\SampleOrderSystem.exe"
